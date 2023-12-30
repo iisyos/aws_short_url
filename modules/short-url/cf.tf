@@ -49,8 +49,21 @@ resource "aws_cloudfront_origin_access_control" "short_url" {
 }
 
 resource "aws_cloudfront_function" "short_url" {
-  name    = "short-url"
-  runtime = "cloudfront-js-2.0"
-  publish = true
-  code    = file("${path.module}/short-url.js")
+  name       = "short-url"
+  runtime    = "cloudfront-js-2.0"
+  publish    = true
+
+  code       = local_file.short_url.content
+}
+
+data "template_file" "short_url" {
+  template = file("${path.module}/short-url.js")
+  vars = {
+    kvs_id = var.kvs_id
+  }
+}
+
+resource "local_file" "short_url" {
+  filename = "${path.module}/rendered-short-url.js"
+  content  = data.template_file.short_url.rendered
 }

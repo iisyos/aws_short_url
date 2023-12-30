@@ -19,3 +19,8 @@ variable "oac_name" {
   type        = string
   default     = "test-oac"
 }
+
+variable "kvs_id" {
+  description = "CloudFront KeyValueStore ID for short URL service"
+  type        = string
+}
