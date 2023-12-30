@@ -22,6 +22,11 @@ resource "aws_cloudfront_distribution" "short_url" {
         forward = "none"
       }
     }
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.short_url.arn
+    }
   }
 
   viewer_certificate {
@@ -41,4 +46,11 @@ resource "aws_cloudfront_origin_access_control" "short_url" {
   origin_access_control_origin_type = "s3"
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
+}
+
+resource "aws_cloudfront_function" "short_url" {
+  name    = "short-url"
+  runtime = "cloudfront-js-2.0"
+  publish = true
+  code    = file("${path.module}/short-url.js")
 }
