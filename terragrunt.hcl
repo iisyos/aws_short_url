@@ -11,3 +11,13 @@ remote_state {
     encrypt = local.backend-config.encrypt
   }
 }
+
+terraform {
+  source = "./modules/short-url"
+}
+
+inputs =  {
+  bucket_name            = "short-url-bucket-20231230"
+  cf_distribution_name   = "short-url-distribution"
+  oac_name               = "short-url-oac"
+}
