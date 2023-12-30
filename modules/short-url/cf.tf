@@ -9,7 +9,8 @@ resource "aws_cloudfront_distribution" "short_url" {
   }
 
   enabled = true
-
+  default_root_object = "index.html"
+  
   default_cache_behavior {
     target_origin_id       = aws_s3_bucket.short_url.id
     viewer_protocol_policy = "allow-all"

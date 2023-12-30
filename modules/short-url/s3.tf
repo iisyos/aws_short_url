@@ -39,3 +39,10 @@ resource "aws_s3_bucket_public_access_block" "short_url" {
   ignore_public_acls      = true
   restrict_public_buckets = true
 }
+
+resource "aws_s3_object" "short_url" {
+  bucket = aws_s3_bucket.short_url.id
+  key    = "index.html"
+  source = "${path.module}/index.html"
+  content_type = "text/html"
+}
