@@ -24,3 +24,8 @@ variable "kvs_id" {
   description = "CloudFront KeyValueStore ID for short URL service"
   type        = string
 }
+
+variable "kvs_arn" {
+  description = "CloudFront KeyValueStore ARN for short URL service"
+  type        = string
+}

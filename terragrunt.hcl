@@ -21,4 +21,5 @@ inputs =  {
   cf_distribution_name   = "short-url-distribution"
   oac_name               = "short-url-oac"
   kvs_id                 = local.env.kvs_id
+  kvs_arn                = local.env.kvs_arn
 }

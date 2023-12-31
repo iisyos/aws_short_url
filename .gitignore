@@ -1,3 +1,5 @@
 .terraform
 .terragrunt-cache
 env.yaml
+node_modules
+
