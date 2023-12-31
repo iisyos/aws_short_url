@@ -66,4 +66,10 @@ POLICY
 resource "aws_lambda_function_url" "short_url" {
     function_name = aws_lambda_function.short_url.function_name
     authorization_type = "NONE"
+  cors {
+    allow_origins     = ["https://${aws_cloudfront_distribution.short_url.domain_name}"]
+    allow_methods     = ["POST"]
+    allow_headers     = ["*"]
+    expose_headers    = ["*"]
+  }
 }

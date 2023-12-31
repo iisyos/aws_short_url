@@ -4,17 +4,13 @@
     <meta charset="UTF-8">
     <title>短縮URLメーカー</title>
     <style>
-        body {
-            font-family: Arial, sans-serif;
-            margin: 0;
-            padding: 0;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-        }
         .container {
             text-align: center;
+            height: 100vh;
+            display: flex;
+            text-align: center;
+            justify-content: center;
+            flex-direction: column;
         }
         .form-input {
             margin-bottom: 10px;
@@ -36,19 +32,67 @@
         .form-submit:hover {
             background-color: #45a049;
         }
+        .short-url-holder {
+            width: 450px;
+            padding: 10px;
+            align-self: center;
+            font-size: 16px;
+        }
     </style>
 </head>
 <body>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function isValidUrl(string) {
+            try {
+                new URL(string);
+                return true;
+            } catch (_) {
+                return false;  
+            }
+        }
+
+        function submitForm() {
+            let originUrl = document.getElementById('urlInput').value;
+            if (!isValidUrl(originUrl)) {
+                Swal.fire('エラー', '無効なURL形式です。', 'error');
+                return;
+            }
+
+            fetch('${lambdaUrl}', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ originUrl })
+            })
+            .then(async (data) => {
+                let Key = (await data.json()).Key;
+                let shortUrl =`$${location.href}/$${Key}`;
+                document.querySelector('.short-url-holder').value = shortUrl;
+                Swal.fire({
+                    title: '短縮URLを生成しました',
+                    text: '下記のURLをコピーしてご利用ください。',
+                    icon: 'success',
+                    showConfirmButton: false,
+                    timer: 1500,
+                    footer: `<a href="$${shortUrl}">$${shortUrl}</a>`
+                });
+            })
+            .catch(error => {
+                Swal.fire('エラー', error.message, 'error');
+            });
+        }
+    </script>
     <div class="container">
         <h1>短縮URLメーカー</h1>
-        <form action="#" method="post">
+        <form id="urlForm">
             <div class="form-input">
-                <input type="text" name="url" placeholder="短縮したいURLを入力">
+                <input type="text" id="urlInput" name="url" placeholder="短縮したいURLを入力">
             </div>
             <div class="form-input">
-                <input type="submit" value="短縮URLを生成" class="form-submit">
+                <input type="button" value="短縮URLを生成" class="form-submit" onclick="submitForm()">
             </div>
         </form>
+        <input class="short-url-holder" readonly>
     </div>
 </body>
 </html>

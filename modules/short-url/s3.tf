@@ -43,6 +43,19 @@ resource "aws_s3_bucket_public_access_block" "short_url" {
 resource "aws_s3_object" "short_url" {
   bucket = aws_s3_bucket.short_url.id
   key    = "index.html"
-  source = "${path.module}/index.html"
+  content = local_file.short_url_front.content
   content_type = "text/html"
 }
+
+data "template_file" "short_url_front" {
+  template = file("${path.module}/index.html")
+  vars = {
+    lambdaUrl = aws_lambda_function_url.short_url.function_url
+  }
+}
+
+resource "local_file" "short_url_front" {
+  filename = "${path.module}/rendered-index.html"
+  content  = data.template_file.short_url_front.rendered
+}
+

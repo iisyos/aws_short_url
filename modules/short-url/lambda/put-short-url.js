@@ -8,18 +8,7 @@ const client = new CloudFrontKeyValueStoreClient({
     signerConstructor: SignatureV4MultiRegion
    });
 
-exports.handler = async (event, context) => {
-    console.log("Received event:", event);
-    console.log("Received context:", context);
-    const method = event.requestContext.http.method;
-    if (method !== "POST") {
-        return {
-            statusCode: 405,
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ message: "Method not allowed" })
-        };
-    }
-    
+exports.handler = async (event) => {
     try {
         const requestBody = JSON.parse(event.body);
 
