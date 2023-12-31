@@ -66,7 +66,7 @@
             })
             .then(async (data) => {
                 let Key = (await data.json()).Key;
-                let shortUrl =`$${location.href}/$${Key}`;
+                let shortUrl =`$${location.href}$${Key}`;
                 document.querySelector('.short-url-holder').value = shortUrl;
                 Swal.fire({
                     title: '短縮URLを生成しました',
