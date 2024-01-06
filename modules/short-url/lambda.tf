@@ -55,7 +55,10 @@ resource "aws_iam_role_policy" "short_url" {
     },
     {
       "Effect": "Allow",
-      "Action": "cloudfront-keyvaluestore:PutKey",
+      "Action": [
+        "cloudfront-keyvaluestore:PutKey",
+        "cloudfront-keyvaluestore:DescribeKeyValueStore"
+      ],
       "Resource": "arn:aws:cloudfront::*:key-value-store/${var.kvs_id}"
     }
   ]
