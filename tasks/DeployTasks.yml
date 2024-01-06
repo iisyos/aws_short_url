@@ -1,0 +1,67 @@
+version: '3'
+
+tasks:
+  main:
+    desc: Deploy the function
+    cmds:
+      - task: npm-install
+      - task: deploy-terragrunt
+      - task: deploy-cloudfront-function
+      - task: publish-cloudfront-function
+  
+  npm-install:
+    desc: Install npm packages
+    internal: true
+    dir: './modules/short-url/lambda'
+    cmds:
+      - npm install
+
+  deploy-terragrunt:
+    desc: terragrunt apply
+    internal: true
+    cmds:
+      - terragrunt init -force-copy
+      - terragrunt apply -auto-approve
+  
+  deploy-cloudfront-function:
+    desc: Deploy CloudFront Functions
+    internal: true
+    cmds:
+      - aws cloudfront get-function --name {{.FUNCTION_NAME}} "a.js"
+      - |
+        aws cloudfront update-function \
+          --name {{.FUNCTION_NAME}} \
+          --if-match "{{.FUNCTION_E_TAG}}" \
+          --function-config '{
+              "Comment": "",
+              "Runtime": "cloudfront-js-2.0",
+              "KeyValueStoreAssociations": {
+                  "Quantity": 1,
+                  "Items": [
+                      {
+                          "KeyValueStoreARN": {{.KEY_VALUE_STORE_ARN}}
+                      }
+                  ]
+              }
+          }' \
+          --function-code $(cat a.js | base64)
+      - rm a.js
+    vars:
+      FUNCTION_NAME:
+        sh: terragrunt output -json | jq '.function_name.value'
+      FUNCTION_E_TAG:
+        sh: aws cloudfront describe-function --name {{.FUNCTION_NAME}} --query "ETag"
+      KEY_VALUE_STORE_ARN:
+        sh: aws cloudfront describe-key-value-store --name {{.KEY_VALUE_STORE_NAME}} --query 'KeyValueStore.ARN'
+
+  publish-cloudfront-function:
+    desc: Publish CloudFront Functions
+    internal: true
+    cmds: 
+      - |
+        aws cloudfront publish-function \
+          --name {{.FUNCTION_NAME}} \
+          --if-match $(aws cloudfront describe-function --name {{.FUNCTION_NAME}} --query "ETag" --output text)
+    vars:
+      FUNCTION_NAME:
+          sh: terragrunt output -json | jq '.function_name.value'

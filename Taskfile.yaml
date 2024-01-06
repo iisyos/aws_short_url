@@ -1,0 +1,18 @@
+version: '3'
+
+env:
+  KEY_VALUE_STORE_NAME: short-url
+
+includes:
+  prepare: ./tasks/PrepareTasks.yml
+  deploy: ./tasks/DeployTasks.yml
+  destroy: ./tasks/DestroyTasks.yml
+
+tasks:
+  open:
+    desc: Open short-url service in Google Chrome
+    cmds:
+      - open -a "Google Chrome" https://{{.DOMAIN_NAME}}
+    vars:
+      DOMAIN_NAME:
+        sh: terragrunt output -json | jq '.domain_name.value' 

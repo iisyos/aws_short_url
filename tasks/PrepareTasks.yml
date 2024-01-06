@@ -1,0 +1,24 @@
+version: '3'
+
+tasks:
+  main:
+    desc: Prepare the environment
+    cmds:
+      - aws cloudfront create-key-value-store --name ${KEY_VALUE_STORE_NAME}
+      - cp env.yaml.example env.yaml
+      - task: replace-env
+  
+  replace-env:
+    desc: Replace env.yaml with the actual values
+    internal: true
+    cmds:
+      - 'yq e -i ".bucket += \"-{{.BUCKET_SUFFIX}}\"" env.yaml'
+      - 'yq e -i ".kvs_id = \"{{.KEY_VALUE_STORE_ID}}\"" env.yaml'
+      - 'yq e -i ".kvs_arn = \"{{.KEY_VALUE_STORE_ARN}}\"" env.yaml'
+    vars:
+      KEY_VALUE_STORE_ID:
+        sh: aws cloudfront describe-key-value-store --name {{.KEY_VALUE_STORE_NAME}} --query 'KeyValueStore.Id'
+      KEY_VALUE_STORE_ARN:
+        sh: aws cloudfront describe-key-value-store --name {{.KEY_VALUE_STORE_NAME}} --query 'KeyValueStore.ARN'
+      BUCKET_SUFFIX:
+        sh: echo {{.KEY_VALUE_STORE_ID}} | cut -d'/' -f2

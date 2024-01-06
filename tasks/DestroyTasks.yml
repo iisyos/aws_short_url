@@ -1,0 +1,11 @@
+version: '3'
+
+tasks:
+  main:
+    desc: Destroy the function
+    cmds:
+      - terragrunt destroy -auto-approve
+      - aws cloudfront delete-key-value-store --name {{.KEY_VALUE_STORE_NAME}} --if-match "{{.KEY_VALUE_STORE_E_TAG}}"
+    vars:
+      KEY_VALUE_STORE_E_TAG:
+        sh: aws cloudfront describe-key-value-store --name {{.KEY_VALUE_STORE_NAME}} --query "ETag"

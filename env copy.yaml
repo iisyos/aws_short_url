@@ -1,0 +1,5 @@
+bucket: "terraform-remote-state-2023-06-19"
+region: "ap-northeast-1"
+encrypt: true
+kvs_id: "2f25096f-c565-4f00-87f9-24bc92c417df"
+kvs_arn: "arn:aws:cloudfront::235087485205:key-value-store/2f25096f-c565-4f00-87f9-24bc92c417df"
